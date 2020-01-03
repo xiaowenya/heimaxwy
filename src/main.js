@@ -14,8 +14,9 @@ Vue.use(ElementUi)
 import axios from 'axios'
 Vue.prototype.$axios=axios
 // 设置基地址
-axios.defaults.baseURL = 'http://127.0.0.1/heimamm/public/'
+// axios.defaults.baseURL = 'http://127.0.0.1/heimamm/public/'
 Vue.config.productionTip = false
+// window.console.log(process.env.VUE_APP_BASEURL);
 
 new Vue({
   render: h => h(App),
