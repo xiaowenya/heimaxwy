@@ -40,12 +40,72 @@
         </el-form-item>
         <el-form-item>
           <el-button class="login-btn" type="primary" @click="submitForm('ruleForm')">登录</el-button>
-          <el-button class="login-btn reset-btn" type="primary" @click="resetForm('ruleForm')">注册</el-button>
+          <el-button class="login-btn reset-btn" type="primary" @click="dialogFormVisible = true">注册</el-button>
         </el-form-item>
       </el-form>
     </div>
     <!-- 右边的图片 -->
-    <img src="../../assets/login_banner_ele.png" alt="" class="bg" />
+    <div class="right">
+      <img src="../../assets/login_banner_ele.png" alt="" class="bg" />
+    </div>
+    <!-- 注册对话框 -->
+    <el-dialog title="用户注册" :visible.sync="dialogFormVisible" class="register-dialog">
+      <el-form :model="regForm" :rules="rules" ref="ruleForm" label-width="80px" class="demo-ruleForm">
+        <!-- 头像 -->
+        <el-form-item label="头像" prop="avatar">
+          <el-upload class="avatar-uploader" action="https://jsonplaceholder.typicode.com/posts/"
+            :show-file-list="false" :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload">
+            <img v-if="imageUrl" :src="imageUrl" class="avatar">
+            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+          </el-upload>
+        </el-form-item>
+        <!-- 昵称 -->
+        <el-form-item label="昵称" prop="nickname">
+          <el-input v-model="ruleForm.nickname" autocomplete="off">
+          </el-input>
+        </el-form-item>
+        <!-- 邮箱 -->
+        <el-form-item label="邮箱" prop="email">
+          <el-input v-model="ruleForm.email" autocomplete="off">
+          </el-input>
+        </el-form-item>
+        <!-- 手机 -->
+        <el-form-item label="手机" prop="phone">
+          <el-input v-model="ruleForm.phone" autocomplete="off"></el-input>
+        </el-form-item>
+        <!-- 密码 -->
+        <el-form-item label="密码" prop="password">
+          <el-input show-password v-model="ruleForm.password" autocomplete="off"></el-input>
+        </el-form-item>
+        <!-- 图形码 -->
+        <el-form-item label="图形码" prop="imgCode">
+          <el-row>
+            <el-col :span="16">
+              <el-input v-model="ruleForm.imgCode" autocomplete="off"></el-input>
+            </el-col>
+            <el-col :span="7" :offset="1">
+              <img class="captcha" :src="regActions" @click="randomRegisterCaptcha" alt="" />
+            </el-col>
+          </el-row>
+        </el-form-item>
+        <!-- 验证码 -->
+        <el-form-item label="验证码" prop="rcode">
+          <el-row>
+            <el-col :span="16">
+              <el-input v-model="ruleForm.rcode" autocomplete="off">
+              </el-input>
+            </el-col>
+            <el-col :span="7" :offset="1">
+              <el-button>获取验证码</el-button>
+            </el-col>
+          </el-row>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="submitForm('ruleForm')">立即创建</el-button>
+          <el-button @click="resetForm('ruleForm')">重置</el-button>
+        </el-form-item>
+      </el-form>
+    </el-dialog>
   </div>
 </template>
 
@@ -70,7 +130,11 @@
   export default {
     data() {
       return {
+        imageUrl: '',
+        dialogFormVisible: false,
+        // formLabelWidth: '120px',
         codeUrl: process.env.VUE_APP_BASEURL + "/captcha?type=login",
+        regActions: process.env.VUE_APP_BASEURL + "/captcha?type=sendsms",
         ruleForm: {
           phone: "",
           password: "",
@@ -107,7 +171,16 @@
               trigger: "change"
             }
           ]
-        }
+        },
+        regForm: {
+          phone: "",
+          nickname: "",
+          rcode: "",
+          avatar: "",
+          password: "",
+          // 图形验证码
+          imgCode: ""
+        },
       };
     },
     methods: {
@@ -136,9 +209,9 @@
             }).then(res => {
               //成功回调
               // window.console.log(res)
-              if(res.data.code==201) {
+              if (res.data.code == 201) {
                 this.$message.error(res.data.message)
-              } else if(res.data.code==200) {
+              } else if (res.data.code == 200) {
                 this.$message.success('登录成功')
               }
             });
@@ -148,8 +221,25 @@
           }
         });
       },
-      resetForm(formName) {
-        this.$refs[formName].resetFields();
+      handleAvatarSuccess(res, file) {
+        this.imageUrl = URL.createObjectURL(file.raw);
+      },
+      beforeAvatarUpload(file) {
+        const isJPG = file.type === 'image/jpeg';
+        const isLt2M = file.size / 1024 / 1024 < 2;
+        if (!isJPG) {
+          this.$message.error('上传头像图片只能是 JPG 格式!');
+        }
+        if (!isLt2M) {
+          this.$message.error('上传头像图片大小不能超过 2MB!');
+        }
+        return isJPG && isLt2M;
+      },
+      randomRegisterCaptcha() {
+        // 通过时间戳来重新获取验证码
+        this.regActions = `${
+        process.env.VUE_APP_BASEURL
+        }/captcha?type=sendsms&t=${Date.now()}`;
       }
     }
   };
@@ -160,9 +250,7 @@
     display: flex;
     align-items: center;
     justify-content: space-around;
-    background: linear-gradient(225deg,
-        rgba(20, 147, 250, 1),
-        rgba(1, 198, 250, 1));
+    background: linear-gradient(225deg, rgba(20, 147, 250, 1), rgba(1, 198, 250, 1));
     height: 100%;
 
     .left {
@@ -231,6 +319,55 @@
       .reset-btn {
         margin-top: 28px;
       }
+
+      .register-dialog {
+        .el-dialog {
+          width: 600px;
+        }
+
+        .el-dialog__header {
+          background: linear-gradient(right,
+              rgba(1, 198, 250, 1),
+              rgba(20, 147, 250, 1));
+          text-align: center;
+
+          .el-dialog__title {
+            color: white;
+          }
+        }
+
+        .captcha {
+          width: 100%;
+        }
+
+        .avatar-uploader .el-upload {
+          border: 1px dashed #d9d9d9;
+          border-radius: 6px;
+          cursor: pointer;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .avatar-uploader .el-upload:hover {
+          border-color: #409EFF;
+        }
+
+        .avatar-uploader-icon {
+          font-size: 28px;
+          color: #8c939d;
+          width: 178px;
+          height: 178px;
+          line-height: 178px;
+          text-align: center;
+        }
+
+        .avatar {
+          width: 178px;
+          height: 178px;
+          display: block;
+        }
+      }
     }
+
   }
 </style>
