@@ -9,14 +9,38 @@
         <div class="sub-title">用户登陆</div>
       </div>
       <div class="content-box">
-        <el-input placeholder="请输入手机号" prefix-icon="el-icon-user" v-model="username" class="username">
+        <el-input
+          placeholder="请输入手机号"
+          prefix-icon="el-icon-user"
+          v-model="username"
+          class="username"
+        >
         </el-input>
-        <el-input placeholder="请输入密码" show-password prefix-icon="el-icon-lock" v-model="password" class="password">
+        <el-input
+          placeholder="请输入密码"
+          show-password
+          prefix-icon="el-icon-lock"
+          v-model="password"
+          class="password"
+        >
         </el-input>
-        <el-input placeholder="请输入验证码" prefix-icon="el-icon-key" v-model="code" class="code">
-        </el-input>
+        <div class="code-box">
+          <el-input
+            placeholder="请输入验证码"
+            prefix-icon="el-icon-key"
+            v-model="code"
+            class="code"
+          >
+            <img :src="codeUrl" alt="" @click="getUrl" />
+          </el-input>
+        </div>
         <!-- `checked` 为 true 或 false -->
-        <el-checkbox v-model="checked">我已阅读并同意<el-link type="primary">用户协议</el-link>和<el-link type="primary">隐私条款</el-link></el-checkbox>
+        <el-checkbox v-model="checked"
+          >我已阅读并同意<el-link type="primary">用户协议</el-link>和<el-link
+            type="primary"
+            >隐私条款</el-link
+          ></el-checkbox
+        >
         <el-button type="primary" class="btn">登录</el-button>
         <el-button type="primary" class="btn">注册</el-button>
       </div>
@@ -28,18 +52,32 @@
 
 <script>
 export default {
-  data () {
+  data() {
     return {
-      username:'',
-      password:'',
-      code:'',
+      username: "",
+      password: "",
+      code: "",
       checked: false,
+      codeUrl: ""
+    };
+  },
+  created() {
+    this.getUrl()
+  },
+  methods: {
+    getUrl() {
+      this.$axios({
+        url: "captcha?type=login",
+      }).then(res => {
+        //成功回调
+        window.console.log(res);
+      });
     }
   }
 };
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
 .login-container {
   display: flex;
   align-items: center;
@@ -83,7 +121,9 @@ export default {
     .content-box {
       padding-left: 43px;
       padding-right: 41px;
-      .username,.password,.code {
+      .username,
+      .password,
+      .code {
         margin-bottom: 26px;
       }
       button {
@@ -92,10 +132,19 @@ export default {
       .username .el-input__inner {
         height: 45px;
       }
+      .code-box {
+        .code {
+          width: 284px;
+        }
+        img {
+          width: 110px;
+          height: 42px;
+        }
+      }
       .btn {
         width: 100%;
-        &+.btn {
-          margin-left:0;
+        & + .btn {
+          margin-left: 0;
         }
       }
     }
