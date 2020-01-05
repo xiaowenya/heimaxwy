@@ -57,34 +57,34 @@
       <el-form :model="regForm" :rules="rules" ref="regForm" label-width="60px" class="demo-ruleForm">
         <!-- 头像 -->
         <el-form-item label="头像" prop="avatar">
-          <el-upload class="avatar-uploader" action="https://jsonplaceholder.typicode.com/posts/"
-            :show-file-list="false" :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload">
+          <el-upload class="avatar-uploader" :action="upLoadURL" :show-file-list="false"
+            :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload" name="image">
             <img v-if="imageUrl" :src="imageUrl" class="avatar">
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
           </el-upload>
           <el-input v-model="regForm.avatar" type="hidden"></el-input>
         </el-form-item>
         <!-- 昵称 -->
-        <el-form-item label="昵称" prop="nickname">
-          <el-input v-model="ruleForm.nickname" autocomplete="off"></el-input>
+        <el-form-item label="昵称" prop="username">
+          <el-input v-model="regForm.username" autocomplete="off"></el-input>
         </el-form-item>
         <!-- 邮箱 -->
         <el-form-item label="邮箱" prop="email">
-          <el-input v-model="ruleForm.email" autocomplete="off"></el-input>
+          <el-input v-model="regForm.email" autocomplete="off"></el-input>
         </el-form-item>
         <!-- 手机 -->
         <el-form-item label="手机" prop="phone">
-          <el-input v-model="ruleForm.phone" autocomplete="off"></el-input>
+          <el-input v-model="regForm.phone" autocomplete="off"></el-input>
         </el-form-item>
         <!-- 密码 -->
         <el-form-item label="密码" prop="password">
-          <el-input show-password v-model="ruleForm.password" autocomplete="off"></el-input>
+          <el-input show-password v-model="regForm.password" autocomplete="off"></el-input>
         </el-form-item>
         <!-- 图形码 -->
-        <el-form-item label="图形码" prop="imgCode">
+        <el-form-item label="图形码" prop="code">
           <el-row>
             <el-col :span="16">
-              <el-input v-model="ruleForm.imgCode" autocomplete="off"></el-input>
+              <el-input v-model="regForm.code" autocomplete="off"></el-input>
             </el-col>
             <el-col :span="7" :offset="1">
               <img class="captcha" :src="regActions" @click="randomRegisterCaptcha" alt="" />
@@ -95,11 +95,11 @@
         <el-form-item label="验证码" prop="rcode">
           <el-row>
             <el-col :span="16">
-              <el-input v-model="ruleForm.rcode" autocomplete="off">
+              <el-input v-model="regForm.rcode" autocomplete="off">
               </el-input>
             </el-col>
             <el-col :span="7" :offset="1">
-              <el-button>获取用户验证码</el-button>
+              <el-button @click="getMessage" :disabled="delayTime != 0">{{ btnMessage }}</el-button>
             </el-col>
           </el-row>
         </el-form-item>
@@ -147,11 +147,16 @@
       }
     }
   };
-  import { login } from '../../api/login'
+  import {
+    login,
+    sendsms,
+    register
+  } from '../../api/login'
   export default {
     data() {
       return {
         imageUrl: '',
+        upLoadURL: process.env.VUE_APP_BASEURL + '/uploads',
         dialogFormVisible: false,
         // formLabelWidth: '120px',
         codeUrl: process.env.VUE_APP_BASEURL + "/captcha?type=login",
@@ -186,7 +191,6 @@
             }
           ],
           code: [{
-              required: true,
               message: "验证码不能为空",
               trigger: "blur"
             },
@@ -202,21 +206,32 @@
             message: "头像不能为空",
             trigger: "change"
           }],
-          nickname: [{
+          username: [{
             required: true,
-            message: "用户名不能为空"
+            message: "用户名不能为空",
+            trigger: "blur"
           }],
+          rcode: [{
+            min: 4,
+            max: 4,
+            message: "长度在必须为4",
+            trigger: "change"
+          }]
         },
         regForm: {
           phone: "",
-          nickname: "",
+          username: "",
           rcode: "",
           avatar: "",
           password: "",
           // 图形验证码
-          imgCode: "",
+          code: "",
           email: ''
         },
+        // 定义按钮的文本
+        btnMessage: "获取用户验证码",
+        // 定义倒计时的时间
+        delayTime: 0,
       };
     },
     methods: {
@@ -251,7 +266,15 @@
       submitRegForm(formName) {
         this.$refs[formName].validate(valid => {
           if (valid) {
-            this.$message.success("验证成功");
+            // this.$message.success("验证成功");
+            register(this.regForm).then(res => {
+              if (res.data.code == 201) {
+                this.$message.error(res.data.message)
+              } else if (res.data.code == 200) {
+                this.$message.success('注册成功,请登录')
+                this.dialogFormVisible = false
+              }
+            })
           } else {
             this.$message.error("格式不对哦，检查一下呗！");
             return false;
@@ -260,6 +283,8 @@
       },
       handleAvatarSuccess(res, file) {
         this.imageUrl = URL.createObjectURL(file.raw);
+        // window.console.log(res)
+        this.regForm.avatar=res.data.file_path
       },
       beforeAvatarUpload(file) {
         const isJPG = file.type === 'image/jpeg';
@@ -277,6 +302,49 @@
         this.regActions = `${
         process.env.VUE_APP_BASEURL
         }/captcha?type=sendsms&t=${Date.now()}`;
+      },
+      getMessage() {
+        // 手机号
+        const reg = /^(0|86|17951)?(13[0-9]|15[012356789]|166|17[3678]|18[0-9]|14[57])[0-9]{8}$/;
+        if (reg.test(this.regForm.phone) == false) {
+          return this.$message.error("小老弟，手机号不太对哦！！！");
+        }
+        // 图片验证码
+        if (this.regForm.code.length != 4) {
+          return this.$message.error("小老弟，图形验证码不太对哦！！！");
+        }
+        // 如果没有倒计时 开启
+        if (this.delayTime === 0) {
+          // 改成60
+          this.delayTime = 60;
+          // 判断 一些值
+          const interId = setInterval(() => {
+            // 递减
+            this.delayTime--;
+            // 修改显示的文本
+            this.btnMessage = `还剩下${this.delayTime}秒哦！`;
+            if (this.delayTime === 0) {
+              // 倒计时结束
+              // 清除定时器
+              clearInterval(interId);
+              // 还原文本
+              this.btnMessage = "获取用户验证码";
+            }
+          }, 100);
+        } else {
+          // 正在倒计时中
+          return;
+        }
+        // 调用接口
+        sendsms({
+          code: this.regForm.code,
+          phone: this.regForm.phone,
+        }).then(res => {
+          // window.console.log(res)
+          if (res.data.code == 200) {
+            this.$message.success("短信验证码是:" + res.data.data.captcha)
+          }
+        })
       }
     }
   };
@@ -287,7 +355,7 @@
     display: flex;
     align-items: center;
     justify-content: space-around;
-    background: linear-gradient(right, rgba(20, 147, 250, 1), rgba(1, 198, 250, 1));
+    background: linear-gradient(to right, rgba(20, 147, 250, 1), rgba(1, 198, 250, 1));
     height: 100%;
 
     .left {
