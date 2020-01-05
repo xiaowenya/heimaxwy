@@ -3,7 +3,7 @@
     <!-- 左边的盒子 -->
     <div class="left">
       <div class="title-box">
-        <div class="logn"><img src="../../assets/logo.png" alt="" /></div>
+        <div class="logo"><img src="../../assets/logo.png" alt="" /></div>
         <div class="title">黑马面面</div>
         <div class="line"></div>
         <div class="sub-title">用户登陆</div>
@@ -179,27 +179,27 @@
             trigger: "blur"
           }],
           password: [{
-              required: true,
-              message: "密码不能为空",
-              trigger: "blur"
-            },
-            {
-              min: 6,
-              max: 20,
-              message: "长度在 6 到 20 个字符",
-              trigger: "change"
-            }
+            required: true,
+            message: "密码不能为空",
+            trigger: "blur"
+          },
+          {
+            min: 6,
+            max: 20,
+            message: "长度在 6 到 20 个字符",
+            trigger: "change"
+          }
           ],
           code: [{
-              message: "验证码不能为空",
-              trigger: "blur"
-            },
-            {
-              min: 4,
-              max: 4,
-              message: "长度在必须为4",
-              trigger: "change"
-            }
+            message: "验证码不能为空",
+            trigger: "blur"
+          },
+          {
+            min: 4,
+            max: 4,
+            message: "长度在必须为4",
+            trigger: "change"
+          }
           ],
           avatar: [{
             required: true,
@@ -248,7 +248,7 @@
           if (valid) {
             // this.$message.success("验证成功");
             login(this.ruleForm).then(res => {
-              window.console.log(res)
+              // window.console.log(res)
               if (res.data.code == 201) {
                 this.$message.error(res.data.message)
               } else if (res.data.code == 200) {
@@ -284,7 +284,7 @@
       handleAvatarSuccess(res, file) {
         this.imageUrl = URL.createObjectURL(file.raw);
         // window.console.log(res)
-        this.regForm.avatar=res.data.file_path
+        this.regForm.avatar = res.data.file_path
       },
       beforeAvatarUpload(file) {
         const isJPG = file.type === 'image/jpeg';
@@ -300,8 +300,8 @@
       randomRegisterCaptcha() {
         // 通过时间戳来重新获取验证码
         this.regActions = `${
-        process.env.VUE_APP_BASEURL
-        }/captcha?type=sendsms&t=${Date.now()}`;
+          process.env.VUE_APP_BASEURL
+          }/captcha?type=sendsms&t=${Date.now()}`;
       },
       getMessage() {
         // 手机号
@@ -370,7 +370,7 @@
         margin-left: 48px;
         margin-bottom: 29px;
 
-        .logn img {
+        .logo img {
           width: 22px;
           height: 17px;
           margin-right: 16px;
@@ -398,7 +398,7 @@
         padding-right: 41px;
         margin-top: 27px;
 
-        // 栅格 验证码
+        /* 栅格 验证码 */
         .code-col {
           height: 40px;
 
@@ -408,14 +408,14 @@
           }
         }
 
-        // 更高的文本框
+        /* 更高的文本框 */
         .high-input>input {
           height: 45px;
           line-height: 45px;
         }
       }
 
-      // 表单内部的 按钮
+      /* 表单内部的 按钮 */
       .login-btn {
         width: 100%;
         margin-left: 0;
