@@ -33,11 +33,15 @@
           </el-row>
         </el-form-item>
         <!-- 协议 -->
-        <el-form-item prop="checked">
+        <el-form-item class="url-box">
           <el-checkbox v-model="ruleForm.checked">
-            我已阅读并同意<el-link type="primary">用户协议</el-link>和<el-link type="primary">隐私条款</el-link>
+            我已阅读并同意
+            <el-link type="primary">用户协议</el-link>
+            <span>和</span>
+            <el-link type="primary">隐私条款</el-link>
           </el-checkbox>
         </el-form-item>
+        <!-- 按钮区 -->
         <el-form-item>
           <el-button class="login-btn" type="primary" @click="submitForm('ruleForm')">登录</el-button>
           <el-button class="login-btn reset-btn" type="primary" @click="dialogFormVisible = true">注册</el-button>
@@ -50,7 +54,7 @@
     </div>
     <!-- 注册对话框 -->
     <el-dialog title="用户注册" :visible.sync="dialogFormVisible" class="register-dialog">
-      <el-form :model="regForm" :rules="rules" ref="ruleForm" label-width="80px" class="demo-ruleForm">
+      <el-form :model="regForm" :rules="rules" ref="regForm" label-width="60px" class="demo-ruleForm">
         <!-- 头像 -->
         <el-form-item label="头像" prop="avatar">
           <el-upload class="avatar-uploader" action="https://jsonplaceholder.typicode.com/posts/"
@@ -58,16 +62,15 @@
             <img v-if="imageUrl" :src="imageUrl" class="avatar">
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
           </el-upload>
+          <el-input v-model="regForm.avatar" type="hidden"></el-input>
         </el-form-item>
         <!-- 昵称 -->
         <el-form-item label="昵称" prop="nickname">
-          <el-input v-model="ruleForm.nickname" autocomplete="off">
-          </el-input>
+          <el-input v-model="ruleForm.nickname" autocomplete="off"></el-input>
         </el-form-item>
         <!-- 邮箱 -->
         <el-form-item label="邮箱" prop="email">
-          <el-input v-model="ruleForm.email" autocomplete="off">
-          </el-input>
+          <el-input v-model="ruleForm.email" autocomplete="off"></el-input>
         </el-form-item>
         <!-- 手机 -->
         <el-form-item label="手机" prop="phone">
@@ -96,15 +99,15 @@
               </el-input>
             </el-col>
             <el-col :span="7" :offset="1">
-              <el-button>获取验证码</el-button>
+              <el-button>获取用户验证码</el-button>
             </el-col>
           </el-row>
         </el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="submitForm('ruleForm')">立即创建</el-button>
-          <el-button @click="resetForm('ruleForm')">重置</el-button>
-        </el-form-item>
       </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="submitRegForm('regForm')">确 定</el-button>
+      </div>
     </el-dialog>
   </div>
 </template>
@@ -127,6 +130,24 @@
       }
     }
   };
+  // 定义验证邮箱的方法
+  const validateEmail = (rule, value, callback) => {
+    if (value === "") {
+      callback(new Error("邮箱不能为空"));
+    } else {
+      // 定义正则 正则  对象
+      const reg = /\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/;
+      // 验证
+      if (reg.test(value) == true) {
+        // 对
+        callback();
+      } else {
+        // 错
+        callback(new Error("邮箱格式错误"));
+      }
+    }
+  };
+  import { login } from '../../api/login'
   export default {
     data() {
       return {
@@ -147,6 +168,11 @@
             validator: validatePhone,
             trigger: "blur"
           }],
+          email: [{
+            required: true,
+            validator: validateEmail,
+            trigger: "blur"
+          }],
           password: [{
               required: true,
               message: "密码不能为空",
@@ -161,7 +187,7 @@
           ],
           code: [{
               required: true,
-              message: "验证码",
+              message: "验证码不能为空",
               trigger: "blur"
             },
             {
@@ -170,7 +196,16 @@
               message: "长度在必须为4",
               trigger: "change"
             }
-          ]
+          ],
+          avatar: [{
+            required: true,
+            message: "头像不能为空",
+            trigger: "change"
+          }],
+          nickname: [{
+            required: true,
+            message: "用户名不能为空"
+          }],
         },
         regForm: {
           phone: "",
@@ -179,7 +214,8 @@
           avatar: "",
           password: "",
           // 图形验证码
-          imgCode: ""
+          imgCode: "",
+          email: ''
         },
       };
     },
@@ -196,25 +232,26 @@
         this.$refs[formName].validate(valid => {
           if (valid) {
             // this.$message.success("验证成功");
-            this.$axios({
-              url: process.env.VUE_APP_BASEURL + '/login',
-              method: 'post',
-              withCredentials: true,
-              data: {
-                "phone": this.ruleForm.phone,
-                "password": this.ruleForm.password,
-                "code": this.ruleForm.code
-              },
-              // params: { 'get请求参数'}
-            }).then(res => {
-              //成功回调
-              // window.console.log(res)
+            login(this.ruleForm).then(res => {
+              window.console.log(res)
               if (res.data.code == 201) {
                 this.$message.error(res.data.message)
               } else if (res.data.code == 200) {
                 this.$message.success('登录成功')
+                window.sessionStorage.token = res.data.data.token
+                this.$router.push('/index')
               }
-            });
+            })
+          } else {
+            this.$message.error("格式不对哦，检查一下呗！");
+            return false;
+          }
+        });
+      },
+      submitRegForm(formName) {
+        this.$refs[formName].validate(valid => {
+          if (valid) {
+            this.$message.success("验证成功");
           } else {
             this.$message.error("格式不对哦，检查一下呗！");
             return false;
@@ -245,7 +282,7 @@
   };
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
   .login-container {
     display: flex;
     align-items: center;
@@ -320,15 +357,25 @@
         margin-top: 28px;
       }
 
-      .register-dialog {
-        .el-dialog {
-          width: 600px;
+      .url-box {
+        .el-checkbox {
+          display: flex;
+          align-items: center;
+
+          .el-checkbox__label {
+            display: flex;
+            align-items: center;
+          }
         }
+      }
+    }
+
+    .register-dialog {
+      .el-dialog {
+        width: 600px;
 
         .el-dialog__header {
-          background: linear-gradient(right,
-              rgba(1, 198, 250, 1),
-              rgba(20, 147, 250, 1));
+          background: linear-gradient(right, rgba(1, 198, 250, 1), rgba(20, 147, 250, 1));
           text-align: center;
 
           .el-dialog__title {
@@ -338,6 +385,11 @@
 
         .captcha {
           width: 100%;
+        }
+
+        .avatar-uploader {
+          display: flex;
+          justify-content: center;
         }
 
         .avatar-uploader .el-upload {
@@ -366,8 +418,12 @@
           height: 178px;
           display: block;
         }
+
+        .dialog-footer {
+          display: flex;
+          justify-content: center
+        }
       }
     }
-
   }
 </style>
