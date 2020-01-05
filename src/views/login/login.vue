@@ -287,7 +287,7 @@
     display: flex;
     align-items: center;
     justify-content: space-around;
-    background: linear-gradient(225deg, rgba(20, 147, 250, 1), rgba(1, 198, 250, 1));
+    background: linear-gradient(right, rgba(20, 147, 250, 1), rgba(1, 198, 250, 1));
     height: 100%;
 
     .left {
