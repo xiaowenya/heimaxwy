@@ -24,7 +24,8 @@
 </template>
 
 <script>
-  import { info } from '../../api/login'
+  import { info, logout } from '../../api/login'
+  import { removeToken } from '../../utils/token'
   export default {
     data() {
       return {
@@ -41,8 +42,20 @@
     },
     methods: {
       logout() {
-        window.sessionStorage.removeItem('token')
-        this.$router.push('/login')
+        this.$confirm('确认要退出?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          logout().then(res => {
+            if (res.data.code === 200) {
+              removeToken()
+              this.$router.push('./login')
+            }
+          })
+        }).catch(() => {
+
+        })
       }
     },
   }

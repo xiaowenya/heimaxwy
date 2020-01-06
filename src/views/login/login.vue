@@ -113,6 +113,7 @@
 </template>
 
 <script>
+  import { saveToken } from '../../utils/token'
   // 定义验证手机号的方法
   const validatePhone = (rule, value, callback) => {
     if (value === "") {
@@ -248,12 +249,14 @@
           if (valid) {
             // this.$message.success("验证成功");
             login(this.ruleForm).then(res => {
-              // window.console.log(res)
+              window.console.log(res)
               if (res.data.code == 201) {
                 this.$message.error(res.data.message)
               } else if (res.data.code == 200) {
                 this.$message.success('登录成功')
-                window.sessionStorage.token = res.data.data.token
+                // window.sessionStorage.token = res.data.data.token
+                // window.console.log(res.data.data.token)
+                saveToken(res.data.data.token)
                 this.$router.push('/index')
               }
             })
@@ -273,6 +276,8 @@
               } else if (res.data.code == 200) {
                 this.$message.success('注册成功,请登录')
                 this.dialogFormVisible = false
+                this.$refs.regForm.resetFields()
+                this.imageUrl = ''
               }
             })
           } else {

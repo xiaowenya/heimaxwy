@@ -1,5 +1,7 @@
 import axios from 'axios'
-
+import {
+  getToken
+} from '../utils/token'
 //定义一个登录的方法,并暴露出去
 export function login(data) {
   return axios({
@@ -29,7 +31,7 @@ export function register(data) {
     data // data: data
   });
 }
-// 定义一个 获取用户信息 方法 并暴露出去
+// 获取用户信息
 export function info() {
   return axios({
     url: process.env.VUE_APP_BASEURL + "/info",
@@ -37,7 +39,26 @@ export function info() {
     // 跨域 是否携带 cookie
     withCredentials: true,
     headers: {
-      token: window.sessionStorage.token
+      // 从缓存中获取
+      // token:window.localStorage.getItem("heimammtoken")
+      // 调用 抽取的 token函数来获取token
+      token: getToken()
+    }
+  });
+}
+
+// 用户退出
+export function logout() {
+  return axios({
+    url: process.env.VUE_APP_BASEURL + "/logout",
+    method: "get",
+    // 跨域 是否携带 cookie
+    withCredentials: true,
+    headers: {
+      // 从缓存中获取
+      // token:window.localStorage.getItem("heimammtoken")
+      // 调用 抽取的 token函数来获取token
+      token: getToken()
     }
   });
 }
