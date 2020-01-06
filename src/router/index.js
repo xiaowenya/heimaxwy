@@ -5,19 +5,45 @@ import VueRouter from 'vue-router'
 // 导入组件
 import login from '../views/login/login'
 import index from '../views/index/index'
+import user from '../views/index/user/user'
+import chart from '../views/index/chart/chart'
+import enterprise from '../views/index/enterprise/enterprise'
+import subject from '../views/index/subject/subject'
+import question from '../views/index/question/question'
+
 // 注册路由
 Vue.use(VueRouter)
 // 实例化路由(创建路由对象)
-let router =new VueRouter({
+let router = new VueRouter({
   // 配置路由
-  routes:[
-    {
-      path:"/login",
-      component:login
+  routes: [{
+      path: "/login",
+      component: login
     },
     {
-      path:"/index",
-      component:index
+      path: "/index",
+      component: index,
+      children: [{
+          path: 'chart',
+          component: chart
+        },
+        {
+          path: 'user',
+          component: user
+        },
+        {
+          path: 'question',
+          component: question
+        },
+        {
+          path: 'enterprise',
+          component: enterprise
+        },
+        {
+          path: 'subject',
+          component: subject
+        },
+      ]
     },
   ]
 })
@@ -36,5 +62,3 @@ let router =new VueRouter({
 // })
 // 暴露路由
 export default router
-
-
