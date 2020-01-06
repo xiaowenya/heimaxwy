@@ -18,24 +18,29 @@
       <el-container>
         <!-- 宽度设为自适应 -->
         <el-aside width="auto" class="index-aside">
+          <!-- 开启路由 -->
           <el-menu router :default-active="$route.path" class="el-menu-vertical-demo" :collapse="collapse">
+            <!-- 数据概览 -->
             <el-menu-item index="/index/chart">
-              <!-- e-charts -->
               <i class="el-icon-pie-chart"></i>
               <span slot="title">数据概览</span>
             </el-menu-item>
+            <!-- 用户列表 -->
             <el-menu-item index="/index/user">
               <i class="el-icon-user"></i>
               <span slot="title">用户列表</span>
             </el-menu-item>
+            <!-- 题库列表 -->
             <el-menu-item index="/index/question">
               <i class="el-icon-edit-outline"></i>
               <span slot="title">题库列表</span>
             </el-menu-item>
+            <!-- 企业列表 -->
             <el-menu-item index="/index/enterprise">
               <i class="el-icon-office-building"></i>
               <span slot="title">企业列表</span>
             </el-menu-item>
+            <!-- 学科列表 -->
             <el-menu-item index="/index/subject">
               <i class="el-icon-notebook-2"></i>
               <span slot="title">学科列表</span>
