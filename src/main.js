@@ -12,11 +12,7 @@ import './style/base.css'
 Vue.use(ElementUi)
 // 设置全局axios
 import axios from 'axios'
-// 请求拦截器
-// axios.interceptors.request.use(config => {
-//   config.headers.Authorization = window.sessionStorage.token
-//   return config
-// })
+
 Vue.prototype.$axios = axios
 // 设置基地址
 // axios.defaults.baseURL = 'http://127.0.0.1/heimamm/public/'

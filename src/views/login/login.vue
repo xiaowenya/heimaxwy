@@ -446,56 +446,47 @@
     .register-dialog {
       .el-dialog {
         width: 600px;
+      }
 
-        .el-dialog__header {
-          background: linear-gradient(right, rgba(1, 198, 250, 1), rgba(20, 147, 250, 1));
-          text-align: center;
+      .captcha {
+        width: 100%;
+      }
 
-          .el-dialog__title {
-            color: white;
-          }
-        }
+      .avatar-uploader {
+        display: flex;
+        justify-content: center;
+      }
 
-        .captcha {
-          width: 100%;
-        }
+      .avatar-uploader .el-upload {
+        border: 1px dashed #d9d9d9;
+        border-radius: 6px;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+      }
 
-        .avatar-uploader {
-          display: flex;
-          justify-content: center;
-        }
+      .avatar-uploader .el-upload:hover {
+        border-color: #409EFF;
+      }
 
-        .avatar-uploader .el-upload {
-          border: 1px dashed #d9d9d9;
-          border-radius: 6px;
-          cursor: pointer;
-          position: relative;
-          overflow: hidden;
-        }
+      .avatar-uploader-icon {
+        font-size: 28px;
+        color: #8c939d;
+        width: 178px;
+        height: 178px;
+        line-height: 178px;
+        text-align: center;
+      }
 
-        .avatar-uploader .el-upload:hover {
-          border-color: #409EFF;
-        }
+      .avatar {
+        width: 178px;
+        height: 178px;
+        display: block;
+      }
 
-        .avatar-uploader-icon {
-          font-size: 28px;
-          color: #8c939d;
-          width: 178px;
-          height: 178px;
-          line-height: 178px;
-          text-align: center;
-        }
-
-        .avatar {
-          width: 178px;
-          height: 178px;
-          display: block;
-        }
-
-        .dialog-footer {
-          display: flex;
-          justify-content: center
-        }
+      .dialog-footer {
+        display: flex;
+        justify-content: center
       }
     }
   }

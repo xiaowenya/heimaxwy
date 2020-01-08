@@ -84,8 +84,8 @@
         }).then(() => {
           logout().then(res => {
             if (res.data.code === 200) {
+              this.$router.push('/login')
               removeToken()
-              this.$router.push('./login')
             }
           })
         }).catch(() => {
