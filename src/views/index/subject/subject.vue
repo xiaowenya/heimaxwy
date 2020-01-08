@@ -47,11 +47,17 @@
         <el-table-column prop="create_time" label="创建日期">
         </el-table-column>
         <el-table-column prop="status" label="状态">
+          <template slot-scope="scope">
+            <span v-if="scope.row.status==0" class="red">禁用</span>
+            <span v-else>启用</span>
+          </template>
         </el-table-column>
         <el-table-column label="操作">
           <template slot-scope="scope">
             <el-button type="text" size="small" @click="handleClick(scope.row)">编辑</el-button>
-            <el-button type="text" size="small">禁用</el-button>
+            <el-button type="text" size="small" @click="changeStatus(scope.row)">
+              {{scope.row.status==0?'启用':'禁用'}}
+            </el-button>
             <el-button type="text" size="small">删除</el-button>
           </template>
         </el-table-column>
@@ -69,7 +75,7 @@
 
 <script>
   import addDialog from './components/addDialog'
-  import { subjectList } from '@/api/subject'
+  import { subjectList, subjectStatus } from '@/api/subject'
   export default {
     name: 'subject',
     data() {
@@ -107,28 +113,38 @@
       handleClick(row) {
         window.console.log(row);
       },
+      changeStatus(item) {
+        // window.console.log(item);
+        subjectStatus({ id: item.id }).then(res => {
+          if (res.code == 200) {
+            this.$message.success('修改成功')
+            this.getList()
+          }
+        })
+      },
       handleSizeChange(val) {
         window.console.log(`每页 ${val} 条`);
       },
       handleCurrentChange(val) {
         window.console.log(`当前页: ${val}`);
       },
+      getList() {
+        subjectList({
+          // 页码
+          page: this.currentPage,
+          // 页容量
+          limit: this.pageSize
+        }).then(res => {
+          // window.console.log(res)
+          if (res.code === 200) {
+            this.tableData = res.data.items
+            this.total = res.data.pagination.total
+          }
+        })
+      }
     },
     created() {
-      subjectList({
-        // 页码
-        page: this.currentPage,
-        // 页容量
-        limit: this.pageSize
-      }).then(res => {
-        window.console.log(res)
-        this.tableData = res.data.items
-        this.total = res.data.pagination.total
-
-        // if(res.code===200) {
-
-        // }
-      })
+      this.getList()
     },
   }
 </script>
@@ -153,6 +169,10 @@
       .el-pagination {
         text-align: center;
         padding-top: 30px;
+      }
+
+      .red {
+        color: #ff3d3d;
       }
     }
   }
