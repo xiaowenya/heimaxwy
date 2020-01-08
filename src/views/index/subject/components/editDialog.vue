@@ -1,36 +1,36 @@
 <template>
   <div>
-    <el-dialog title="新增学科" :visible.sync="dialogFormVisible" width="603px" center>
-      <el-form :model="subjectForm" ref="subjectForm" label-width="80px" :rules="subjectRules">
+    <el-dialog title="编辑学科" :visible.sync="dialogFormVisible" width="603px" center>
+      <el-form :model="editForm" ref="editForm" label-width="80px" :rules="editRules">
         <el-form-item label="学科编号" prop="rid">
-          <el-input v-model="subjectForm.rid"></el-input>
+          <el-input v-model="editForm.rid"></el-input>
         </el-form-item>
         <el-form-item label="学科名称" prop="name">
-          <el-input v-model="subjectForm.name"></el-input>
+          <el-input v-model="editForm.name"></el-input>
         </el-form-item>
         <el-form-item label="学科简称" prop="short_name">
-          <el-input v-model="subjectForm.short_name"></el-input>
+          <el-input v-model="editForm.short_name"></el-input>
         </el-form-item>
         <el-form-item label="学科简介" prop="intro">
-          <el-input v-model="subjectForm.intro" type="textarea"></el-input>
+          <el-input v-model="editForm.intro" type="textarea"></el-input>
         </el-form-item>
         <el-form-item label="学科备注" prop="remark">
-          <el-input v-model="subjectForm.remark"></el-input>
+          <el-input v-model="editForm.remark"></el-input>
         </el-form-item>
       </el-form>
       <span slot="footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="subjectAdd">确 定</el-button>
+        <el-button type="primary" @click="subjectEdit">确 定</el-button>
       </span>
     </el-dialog>
   </div>
 </template>
 <script>
-  import { subjectAdd } from '@/api/subject'
+  import { subjectEdit } from '@/api/subject'
   export default {
     data() {
       return {
-        subjectForm: {
+        editForm: {
           // 学科编号
           rid: '',
           // 学科名称
@@ -42,7 +42,7 @@
           // 学科备注
           remark: '',
         },
-        subjectRules: {
+        editRules: {
           rid: [{ required: true, message: '编号不能为空', trigger: 'blur' }],
           name: [{ required: true, message: '名称不能为空', trigger: 'blur' }],
         },
@@ -50,17 +50,15 @@
       }
     },
     methods: {
-      subjectAdd() {
-        this.$refs.subjectForm.validate(valid => {
+      subjectEdit() {
+        this.$refs.editForm.validate(valid => {
           if (valid) {
-            subjectAdd(this.subjectForm).then(res => {
+            subjectEdit(this.editForm).then(res => {
               if (res.code === 200) {
-                this.$message.success('新增成功')
+                this.$message.success('编辑成功')
                 this.$parent.getList()
                 // 关闭对话框
                 this.dialogFormVisible = false
-                // 清空表单
-                this.$refs.subjectForm.resetFields()
               } else if (res.code === 201) {
                 this.$message.error('学科编号不能重复哦')
               }
