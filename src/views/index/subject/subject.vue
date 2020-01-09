@@ -12,8 +12,8 @@
         <el-form-item label="创建者" prop="username">
           <el-input v-model="formInline.username" class="username"></el-input>
         </el-form-item>
-        <el-form-item label="状态" class="status" prop="status">
-          <el-select v-model="formInline.status" placeholder="请选择状态">
+        <el-form-item label="状态" prop="status">
+          <el-select v-model="formInline.status" placeholder="请选择状态" class="status">
             <el-option label="启用" value="1"></el-option>
             <el-option label="禁用" value="0"></el-option>
           </el-select>
@@ -215,13 +215,13 @@
     .header-card {
       margin-bottom: 20px;
 
-      .rid .el-input__inner,
-      .username .el-input__inner {
+      .rid,
+      .username {
         width: 100px;
       }
 
-      .name .el-input__inner,
-      .status .el-input__inner {
+      .name,
+      .status {
         width: 150px;
       }
     }
