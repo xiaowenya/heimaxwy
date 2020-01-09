@@ -8,6 +8,8 @@ import ElementUi from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 // 导入自己的css样式
 import './style/base.css'
+// 导入全局过滤器
+import './filters/index'
 // 注册element-ui
 Vue.use(ElementUi)
 // 设置全局axios
@@ -18,6 +20,7 @@ Vue.prototype.$axios = axios
 // axios.defaults.baseURL = 'http://127.0.0.1/heimamm/public/'
 Vue.config.productionTip = false
 // window.console.log(process.env.VUE_APP_BASEURL);
+
 
 new Vue({
   render: h => h(App),

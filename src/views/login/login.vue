@@ -169,14 +169,14 @@
           checked: false,
         },
         rules: {
-          phone: [{
-            required: true,
-            validator: validatePhone,
-            trigger: "blur"
-          }],
           email: [{
             required: true,
             validator: validateEmail,
+            trigger: "blur"
+          }],
+          phone: [{
+            required: true,
+            validator: validatePhone,
             trigger: "blur"
           }],
           password: [{
@@ -256,7 +256,10 @@
                 this.$message.success('登录成功')
                 // window.sessionStorage.token = res.data.data.token
                 // window.console.log(res.data.data.token)
+
+                // 保存token
                 saveToken(res.data.data.token)
+                
                 this.$router.push('/index')
               }
             })

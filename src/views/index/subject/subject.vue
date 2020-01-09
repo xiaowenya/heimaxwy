@@ -30,10 +30,10 @@
         </el-form-item>
       </el-form>
     </el-card>
-    
+
     <el-card class="content-box">
       <!-- 表格 -->
-      <el-table :data="tableData" style="width: 100%" max-height="250">
+      <el-table :data="tableData" style="width: 100%">
         <el-table-column type="index" label="序号">
         </el-table-column>
         <el-table-column prop="rid" label="学科编号">
@@ -45,6 +45,9 @@
         <el-table-column prop="username" label="创建者">
         </el-table-column>
         <el-table-column prop="create_time" label="创建日期">
+          <template slot-scope="scope">
+            {{ scope.row.create_time | formatTime }}
+          </template>
         </el-table-column>
         <el-table-column prop="status" label="状态">
           <template slot-scope="scope">
@@ -54,6 +57,11 @@
         </el-table-column>
         <el-table-column label="操作">
           <template slot-scope="scope">
+            <!-- slot-scope 声明了一个变量
+                 template内部就可以通过声明的这个值获取到 索引 和数据
+                 索引 变量.$index
+                 数据 变量.row
+            -->
             <el-button type="text" size="small" @click="editClick(scope.row)">编辑</el-button>
             <el-button type="text" size="small" @click="changeStatus(scope.row)">
               {{scope.row.status==0?'启用':'禁用'}}
@@ -136,6 +144,10 @@
           subjectRemove({ id: item.id }).then(res => {
             if (res.code == 200) {
               this.$message.success('删除成功')
+              if (this.tableData.length == 1) {
+                this.currentPage--;
+                this.currentPage = this.currentPage == 0 ? 1 : this.currentPage
+              }
               this.getList()
             }
           })
@@ -156,6 +168,7 @@
       },
       // 点击搜索
       searchSubject() {
+        this.currentPage = 1
         this.getList()
       },
       // 清空搜索
@@ -183,9 +196,9 @@
             // for (var i = 0; i < this.tableData.length; i++) {
             //   this.tableData[i].create_time = this.tableData[i].create_time.split(' ')[0]
             // }
-            this.tableData.forEach((item) => {
-              item.create_time=item.create_time.split(' ')[0]
-            })
+            // this.tableData.forEach((item) => {
+            //   item.create_time = item.create_time.split(' ')[0]
+            // })
             this.total = res.data.pagination.total
           }
         })

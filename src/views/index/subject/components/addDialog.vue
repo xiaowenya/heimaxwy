@@ -26,6 +26,7 @@
   </div>
 </template>
 <script>
+  // import { subjectAdd } from '../../../../api/subject'
   import { subjectAdd } from '@/api/subject'
   export default {
     data() {
